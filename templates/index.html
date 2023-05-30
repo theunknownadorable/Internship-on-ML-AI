@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cardio Disease Predictor</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background-color: rgba(242, 242, 242, 0.8);
+            padding: 20px;
+            margin-bottom: 20px;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        label, select, input[type="number"], input[type="checkbox"], input[type="radio"] {
+            margin-bottom: 10px;
+            flex-basis: calc(50% - 10px);
+            max-width: 250px;
+        }
+
+        input[type="checkbox"]#active {
+            flex-basis: auto;
+            margin-right: 5px;
+        }
+
+        input[type="button"] {
+            padding: 10px 20px;
+        }
+
+        .predict-button {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cardio-vascular Disease Predictor</h1>
+    </div>
+    <div class="container">
+        <form>
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age">
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+
+            <label for="height">Height:</label>
+            <input type="number" id="height" name="height">
+
+            <label for="weight">Weight:</label>
+            <input type="number" id="weight" name="weight">
+
+            <label for="ap_hi">Systolic Blood Pressure (ap_hi):</label>
+            <input type="number" id="ap_hi" name="ap_hi">
+
+            <label for="ap_lo">Diastolic Blood Pressure (ap_lo):</label>
+            <input type="number" id="ap_lo" name="ap_lo">
+
+            <label for="cholesterol">Cholesterol:</label>
+            <select id="cholesterol" name="cholesterol">
+                <option value="normal">Normal</option>
+                <option value="above_normal">Above Normal</option>
+                <option value="well_above_normal">Well Above Normal</option>
+            </select>
+
+            <label for="glucose">Glucose:</label>
+            <select id="glucose" name="glucose">
+                <option value="normal">Normal</option>
+                <option value="above_normal">Above Normal</option>
+                <option value="well_above_normal">Well Above Normal</option>
+            </select>
+
+            <label for="smoke">Smoking:</label>
+            <div>
+                <input type="radio" id="smoke" name="smoke" value="yes" required>
+                <label for="smoke">Yes</label>
+                <input type="radio" id="smoke_no" name="smoke" value="no" required>
+                <label for="smoke_no">No</label>
+            </div>
+
+            <label for="alco">Alcohol intake:</label>
+            <div>
+                <input type="radio" id="alco" name="alco" value="yes" required>
+                <label for="alco">Yes</label>
+                <input type="radio" id="alco_no" name="alco" value="no" required>
+                <label for="alco_no">No</label>
+            </div>
+
+            <label for="active">Physical activity:</label>
+            <div>
+                <input type="radio" id="active" name="active" value="active" required>
+                <label for="active">Active</label>
+                <input type="radio" id="active_no" name="active" value="not active" required>
+                <label for="active_no">Not Active</label>
+            </div>
+        </form>
+    </div>
+
+    <div class="predict-button">
+        <button id="predictBtn" type="button" class="btn btn-primary btn-block btn-large">Predict</button>
+        <div id="predictionText"></div>
+    </div>
+
+    <script>
+        const predictButton = document.getElementById('predictBtn');
+        const predictionText = document.getElementById('predictionText');
+    
+        predictButton.addEventListener('click', () => {
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+            const apHi = document.getElementById('ap_hi').value;
+            const apLo = document.getElementById('ap_lo').value;
+            const cholesterol = document.getElementById('cholesterol').value;
+            const glucose = document.getElementById('glucose').value;
+            const smoke = document.querySelector('input[name="smoke"]:checked').value;
+            const alco = document.querySelector('input[name="alco"]:checked').value;
+            const active = document.querySelector('input[name="active"]:checked').value;
+    
+            // Send the form data to the server for prediction
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    age,
+                    gender,
+                    height,
+                    weight,
+                    ap_hi: apHi,
+                    ap_lo: apLo,
+                    cholesterol,
+                    glucose,
+                    smoke,
+                    alco,
+                    active,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const predictionResult = data.prediction === 1 ? 'You are at risk of cardiovascular disease.' : 'You are not at risk of cardiovascular disease.';
+                predictionText.textContent = `Prediction: ${predictionResult}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+    
+</body>
+</html>
